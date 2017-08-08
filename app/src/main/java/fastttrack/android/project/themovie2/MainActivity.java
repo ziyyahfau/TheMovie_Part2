@@ -77,8 +77,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     //for save data before destroy
     @Override
-    protected void onSaveInstanceState(Bundle outState)  {
-        //outState.putParcelable(KEY_STATE, gridLayoutManager.onSaveInstanceState());
+    protected void onSaveInstanceState(Bundle outState){
         outState.putParcelable(KEY_STATE, MovieList.getLayoutManager().onSaveInstanceState());
         outState.putString(LIST, new GsonBuilder().create().toJson(movieList));
         super.onSaveInstanceState(outState);
@@ -110,28 +109,35 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             protected String doInBackground(String... params) {
                 RetrofitInterface retrofitInterface = NetworkUtils.getRetrofit().create(RetrofitInterface.class);
 
+                //TODO - beginning checking for the existing movie is alrady favorited
                 //for movie popular
                 Call<Movie> moviePopular = retrofitInterface.getMoviePopular(BuildConfig.MOVIE_API_KEY);
                 try {
                     Movie moviePop = moviePopular.execute().body();
-                    for (Result data:moviePop.getResults()){
+                    for (Result data:moviePop.getResults()) {
 
-                        Cursor cursor = getContentResolver().query(CONTENT_URI, new String[]{String.valueOf(data.getId())}, "movie_id=?", null, null, null);
-                        if(!cursor.moveToFirst()){
+                        //cehking data to database
+                        //Cursor cursor = getContentResolver().query(CONTENT_URI, new String[]{String.valueOf(data.getId())}, "movie_id=?", null, null, null);
+                        String selection = COUMN_ID + "=?";
+                        String[] selectionArgs = new String[]{String.valueOf(data.getId())};
+                        Cursor cursor = getContentResolver().query(CONTENT_URI, null, selection, selectionArgs, null, null);
+                        if (cursor != null) {
 
-                            ContentValues contentValues = new ContentValues();
-                            contentValues.put(COUMN_ID, data.getId());
-                            contentValues.put(COLUMN_TITLE, data.getTitle());
-                            contentValues.put(COLUMN_POSTER, data.getPosterPath());
-                            contentValues.put(COLUMN_SYNOPSIS, data.getOverview());
-                            contentValues.put(COLUMN_RATING, data.getVoteAverage());
-                            contentValues.put(COLUMN_DATERELEASE, data.getReleaseDate());
-                            contentValues.put(COLUMN_ISPOPULAR, 1);
-                            contentValues.put(COLUMN_ISTOPRATED, 0);
+                            if (!cursor.moveToFirst()) {
+                                ContentValues contentValues = new ContentValues();
+                                contentValues.put(COUMN_ID, data.getId());
+                                contentValues.put(COLUMN_TITLE, data.getTitle());
+                                contentValues.put(COLUMN_POSTER, data.getPosterPath());
+                                contentValues.put(COLUMN_SYNOPSIS, data.getOverview());
+                                contentValues.put(COLUMN_RATING, data.getVoteAverage());
+                                contentValues.put(COLUMN_DATERELEASE, data.getReleaseDate());
+                                contentValues.put(COLUMN_ISPOPULAR, 1);
+                                contentValues.put(COLUMN_ISTOPRATED, 0);
 
-                            //untuk akses konten provider
-                            getContentResolver().insert(CONTENT_URI, contentValues);
-
+                                //untuk akses konten provider
+                                getContentResolver().insert(CONTENT_URI, contentValues);
+                            }
+                            cursor.close();
                         }
                     }
                 } catch (IOException e) {
@@ -142,26 +148,34 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Call<Movie> movieTopRated = retrofitInterface.getMovieTopRated(BuildConfig.MOVIE_API_KEY);
                 try {
                     Movie movieTop = movieTopRated.execute().body();
-                    for (Result data:movieTop.getResults()){
+                    for (Result data:movieTop.getResults()) {
 
-                        Cursor cursor = getContentResolver().query(CONTENT_URI, new String[]{String.valueOf(data.getId())}, "movie_id=?", null, null, null);
-                        if(!cursor.moveToFirst()){
+                        //TODO - beginning checking for the existing movie is alrady favorited
+                        //Cursor cursor = getContentResolver().query(CONTENT_URI, new String[]{String.valueOf(data.getId())}, "movie_id=?", null, null, null);
+                        //cehking data to database
+                        //Cursor cursor = getContentResolver().query(CONTENT_URI, new String[]{String.valueOf(data.getId())}, "movie_id=?", null, null, null);
+                        String selection = COUMN_ID + "=?";
+                        String[] selectionArgs = new String[]{String.valueOf(data.getId())};
+                        Cursor cursor = getContentResolver().query(CONTENT_URI, null, selection, selectionArgs, null, null);
+                        if (cursor != null) {
 
-                            ContentValues contentValues = new ContentValues();
-                            contentValues.put(COUMN_ID, data.getId());
-                            contentValues.put(COLUMN_TITLE, data.getTitle());
-                            contentValues.put(COLUMN_POSTER, data.getPosterPath());
-                            contentValues.put(COLUMN_SYNOPSIS, data.getOverview());
-                            contentValues.put(COLUMN_RATING, data.getVoteAverage());
-                            contentValues.put(COLUMN_DATERELEASE, data.getReleaseDate());
-                            contentValues.put(COLUMN_ISPOPULAR, 0);
-                            contentValues.put(COLUMN_ISTOPRATED, 1);
+                            if (!cursor.moveToFirst()) {
+                                ContentValues contentValues = new ContentValues();
+                                contentValues.put(COUMN_ID, data.getId());
+                                contentValues.put(COLUMN_TITLE, data.getTitle());
+                                contentValues.put(COLUMN_POSTER, data.getPosterPath());
+                                contentValues.put(COLUMN_SYNOPSIS, data.getOverview());
+                                contentValues.put(COLUMN_RATING, data.getVoteAverage());
+                                contentValues.put(COLUMN_DATERELEASE, data.getReleaseDate());
+                                contentValues.put(COLUMN_ISPOPULAR, 0);
+                                contentValues.put(COLUMN_ISTOPRATED, 1);
 
-                            //untuk akses konten provider
-                            getContentResolver().insert(CONTENT_URI, contentValues);
-
+                                //untuk akses konten provider
+                                getContentResolver().insert(CONTENT_URI, contentValues);
+                            }
+                            cursor.close();
                         }
-                    };
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

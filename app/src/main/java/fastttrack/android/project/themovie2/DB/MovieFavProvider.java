@@ -128,8 +128,6 @@ public class MovieFavProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String s, String[] strings) {
-
-
         return 0;
     }
 

@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -59,6 +60,7 @@ public class DetailMovie extends AppCompatActivity implements LoaderManager.Load
     //@BindView(R.id.reviewList)
     RecyclerView ReviewList;
     Result data;
+    Button favorite;
     private ReviewAdapter reviewAdapter;
     private TrailerAdapter trailerAdapter;
 
@@ -84,8 +86,9 @@ public class DetailMovie extends AppCompatActivity implements LoaderManager.Load
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.reviewList);
         RecyclerView recyclerViewTrailer = (RecyclerView)findViewById(R.id.trailerList) ;
         TextView textReview = (TextView) findViewById(R.id.textReview);
-        Button favorite = (Button) findViewById(R.id.jadiFavorite);
+        favorite = (Button) findViewById(R.id.jadiFavorite);
 
+        cekFavorite();
 
         titleMovie.setText(data.getTitle());
         dateReleaseMovie.setText(data.getReleaseDate());
@@ -114,12 +117,31 @@ public class DetailMovie extends AppCompatActivity implements LoaderManager.Load
     }
 
 
+    private void cekFavorite(){
+
+        String selection = COUMN_ID + "=?";
+        String[] selectionArgs = new String[]{String.valueOf(data.getId())};
+        Cursor cursor = getContentResolver().query(CONTENT_URI, null, selection, selectionArgs, null, null);
+        if (cursor != null) {
+
+            if(cursor.moveToFirst()){
+                //Log.d("Detail Movie", "Fav Movie: " +cursor.getString(cursor.getColumnIndex(COLUMN_ISFAVORITE)));
+                if(cursor.getString(cursor.getColumnIndex(COLUMN_ISFAVORITE)).equals("0")) {
+                    favorite.setText("Mark as favorite");
+                }
+                else {
+                    favorite.setText("Mark as un-favorite");
+                }
+            }
+            cursor.close();
+        }
+
+    }
     //TODO - cek dulu movie_id udah ada blm di database, kalo udah ada jangan didave datanya tapi di apus, kalo belum ada baru di insert/save
 
     //ini metode onClick favorite movie, kalo di mark as favorite semua data movie yg bersangkutan akan di push ke db
     public void FavoriteMovie (View view){
-        Cursor cursor = getContentResolver().query(CONTENT_URI, null, null, null, null, null);
-        if (cursor.getCount()== 0) {
+
             ContentValues contentValues = new ContentValues();
             contentValues.put(COUMN_ID, data.getId());
             contentValues.put(COLUMN_TITLE, data.getTitle());
@@ -127,31 +149,40 @@ public class DetailMovie extends AppCompatActivity implements LoaderManager.Load
             contentValues.put(COLUMN_SYNOPSIS, data.getOverview());
             contentValues.put(COLUMN_RATING, data.getVoteAverage());
             contentValues.put(COLUMN_DATERELEASE, data.getReleaseDate());
-            contentValues.put(COLUMN_ISFAVORITE, 0);
+            //contentValues.put(COLUMN_ISFAVORITE, 1);
 
-            //getContentResolver().insert(CONTENT_URI, contentValues);
-            getContentResolver().update(CONTENT_URI, contentValues, COUMN_ID + "=?", new String[]{String.valueOf(data.getId())});
-        }
 
-        else {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(COUMN_ID, data.getId());
-            contentValues.put(COLUMN_TITLE, data.getTitle());
-            contentValues.put(COLUMN_POSTER, data.getPosterPath());
-            contentValues.put(COLUMN_SYNOPSIS, data.getOverview());
-            contentValues.put(COLUMN_RATING, data.getVoteAverage());
-            contentValues.put(COLUMN_DATERELEASE, data.getReleaseDate());
-            contentValues.put(COLUMN_ISFAVORITE, 1);
+            String message = "";
+            String selection = COUMN_ID + "=?";
+            String[] selectionArgs = new String[]{String.valueOf(data.getId())};
+            Cursor cursor = getContentResolver().query(CONTENT_URI, null, selection, selectionArgs, null, null);
+            if (cursor != null) {
 
-            //getContentResolver().insert(CONTENT_URI, contentValues);
-            getContentResolver().update(CONTENT_URI, contentValues, COUMN_ID + "=?", new String[]{String.valueOf(data.getId())});
-        }
+                if(cursor.moveToFirst()){
+                    //Log.d("Detail Movie", "Fav Movie: " +cursor.getString(cursor.getColumnIndex(COLUMN_ISFAVORITE)));
+                    if(cursor.getString(cursor.getColumnIndex(COLUMN_ISFAVORITE)).equals("0")) {
+                        message = "Favorite";
+                        contentValues.put(COLUMN_ISFAVORITE, 1);
+                    }
+                    else {
+                        message = "Un-Favorite";
+                        contentValues.put(COLUMN_ISFAVORITE, 0);
+                    }
+                }
+                cursor.close();
+            }
 
-        //untuk akses konten provider (insert)
-        //getContentResolver().insert(CONTENT_URI, contentValues); //ini insert favorite(setiap film yg di click as favprite dia nakal otomatis masuk ke db favprite)
+            int update = getContentResolver().update(CONTENT_URI, contentValues, selection, selectionArgs);
 
-        //Cursor c = getContentResolver().query(CONTENT_URI, null, null, null, null, null);
-        Log.d("bisaa", "");
+            if (update!=0){
+                Toast.makeText(this, message + "Success", Toast.LENGTH_LONG).show();
+            }
+             else{
+                Toast.makeText(this, message + "Failed", Toast.LENGTH_LONG).show();
+            }
+
+        cekFavorite();
+
     }
 
 
