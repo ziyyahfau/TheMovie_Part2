@@ -15,8 +15,6 @@ the last, this application built using retrofit.
 
 # Screenshoot
 
-![](https://user-images.githubusercontent.com/23421283/29106191-bc49f0e6-7cfd-11e7-9b1a-e61122332f92.png)
-
 ![screenshot_20170809-120635 1](https://user-images.githubusercontent.com/23421283/29106191-bc49f0e6-7cfd-11e7-9b1a-e61122332f92.png)
 
 ![screenshot_20170809-120723 1](https://user-images.githubusercontent.com/23421283/29106264-593ca2f4-7cfe-11e7-92bc-d18e6c9ff23c.png)
