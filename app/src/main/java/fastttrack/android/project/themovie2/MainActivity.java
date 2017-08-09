@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                 contentValues.put(COLUMN_DATERELEASE, data.getReleaseDate());
                                 contentValues.put(COLUMN_ISPOPULAR, 1);
                                 contentValues.put(COLUMN_ISTOPRATED, 0);
+                                contentValues.put(COLUMN_ISFAVORITE, 0);
 
                                 //untuk akses konten provider
                                 getContentResolver().insert(CONTENT_URI, contentValues);
@@ -169,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                 contentValues.put(COLUMN_DATERELEASE, data.getReleaseDate());
                                 contentValues.put(COLUMN_ISPOPULAR, 0);
                                 contentValues.put(COLUMN_ISTOPRATED, 1);
+                                contentValues.put(COLUMN_ISFAVORITE, 1);
 
                                 //untuk akses konten provider
                                 getContentResolver().insert(CONTENT_URI, contentValues);
