@@ -15,7 +15,6 @@ the last, this application built using retrofit.
 
 # Screenshoot
 
-<a href="url"><img src="http://url.to/image.png" align="left" height="48" width="48" ></a>
 ![screenshot_20170809-120635 1](https://user-images.githubusercontent.com/23421283/29106191-bc49f0e6-7cfd-11e7-9b1a-e61122332f92.png)
 
 ![screenshot_20170809-120635 1](https://user-images.githubusercontent.com/23421283/29106191-bc49f0e6-7cfd-11e7-9b1a-e61122332f92.png)
